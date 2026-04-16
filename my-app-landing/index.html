@@ -90,9 +90,9 @@
         return;
       }
       
-      if (currentHostname !== customDomain) {
-        return;
-      }
+      // if (currentHostname !== customDomain) {
+      //   return;
+      // }
       
       var appUniversalLink = 'https://' + customDomain + window.location.pathname + window.location.search;
       window.location.href = appUniversalLink;
