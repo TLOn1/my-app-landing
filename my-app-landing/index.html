@@ -58,14 +58,6 @@
       font-size: 0.85rem;
       color: #86868b;
     }
-    .local-badge {
-      background: #f0f0f0;
-      color: #666;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      margin-top: 1rem;
-    }
   </style>
 </head>
 <body>
@@ -76,29 +68,33 @@
       ⬇️ Download on the App Store
     </a>
     <div class="note">ID-ONE App · Hong Kong</div>
-    <div id="localIndicator" class="local-badge"></div>
   </div>
 
   <script>
     (function() {
       var appStoreLink = 'https://apps.apple.com/hk/app/id-one/id6755210949';
-      var productionUniversalLinkDomain = 'https://webekyc-uat.tradelinksig.com';
+      var customDomain = 'webekyc-uat.tradelinksig.com';
       
-      var isLocalhost = window.location.hostname === 'localhost' 
-                     || window.location.hostname === '127.0.0.1'
-                     || window.location.hostname.startsWith('192.168.');
+      var currentHostname = window.location.hostname;
+      var isLocalhost = currentHostname === 'localhost' || currentHostname === '127.0.0.1';
+      var isVercelPreview = currentHostname.endsWith('.vercel.app');
       
-      // 显示本地测试标记（可选）
-      if (isLocalhost) {
-        document.getElementById('localIndicator').innerText = '🧪 本地测试模式 - 自动唤起已禁用';
-        console.log('🧪 本地测试模式：跳过自动唤起 App');
-        return; // 本地不执行唤起逻辑
+      if (isLocalhost || isVercelPreview) {
+        console.log('🧪 测试环境：跳过自动唤起 App');
+        if (isVercelPreview) {
+          var indicator = document.createElement('div');
+          indicator.style.cssText = 'background:#f0f0f0;color:#666;padding:4px 12px;border-radius:20px;font-size:0.75rem;margin-top:1rem;';
+          indicator.innerText = '🧪 Vercel 预览模式';
+          document.querySelector('.container').appendChild(indicator);
+        }
+        return;
       }
       
-      // 线上环境：构建完整 Universal Link
-      var appUniversalLink = productionUniversalLinkDomain + window.location.pathname + window.location.search;
+      if (currentHostname !== customDomain) {
+        return;
+      }
       
-      // 尝试唤起 App
+      var appUniversalLink = 'https://' + customDomain + window.location.pathname + window.location.search;
       window.location.href = appUniversalLink;
       
       var timer = setTimeout(function() {
