@@ -79,7 +79,7 @@
       var isLocalhost = currentHostname === 'localhost' || currentHostname === '127.0.0.1';
       var isVercelPreview = currentHostname.endsWith('.vercel.app');
       
-      if (isLocalhost || isVercelPreview) {
+      if (isLocalhost) {
         console.log('🧪 测试环境：跳过自动唤起 App');
         if (isVercelPreview) {
           var indicator = document.createElement('div');
