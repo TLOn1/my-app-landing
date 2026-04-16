@@ -75,28 +75,41 @@
     var appStoreLink = 'https://apps.apple.com/hk/app/id-one/id6755210949';
     var customDomain = 'webekyc-uat.tradelinksig.com';
     
-    var currentHostname = window.location.hostname;
-    var isLocalhost = currentHostname === 'localhost' || currentHostname === '127.0.0.1';
+    var host = window.location.hostname;
+    var isLocal = host === 'localhost' || host === '127.0.0.1';
+    var isVercel = host.endsWith('.vercel.app');
+    var isCustom = host === customDomain;
     
-    // 只在本地开发环境跳过自动唤起（避免无限刷新）
-    if (isLocalhost) {
-      console.log('🧪 本地测试模式：跳过自动唤起');
+    // 本地开发：只显示页面，不自动跳转
+    if (isLocal) {
+      console.log('🧪 本地环境，无自动跳转');
       return;
     }
     
-    // 在 Vercel 预览域名或自定义域名上，都尝试唤起 App
-    // 注意：Vercel 域名不是 Universal Link 关联域名，所以尝试唤起会失败，进而触发商店跳转
-    var appUniversalLink = window.location.href; // 直接使用当前完整 URL
-    
-    window.location.href = appUniversalLink;
-    
-    var timer = setTimeout(function() {
+    // Vercel 预览域名：直接跳转 App Store（不尝试唤起 App，避免循环）
+    if (isVercel) {
+      console.log('🚀 Vercel 预览域名，直接跳转 App Store');
       window.location.href = appStoreLink;
-    }, 500);
+      return;
+    }
     
-    window.addEventListener('blur', function() {
-      clearTimeout(timer);
-    });
+    // 正式自定义域名：尝试唤起 App，失败后跳转 App Store
+    if (isCustom) {
+      var appUniversalLink = window.location.href;
+      window.location.href = appUniversalLink;
+      
+      var fallbackTimer = setTimeout(function() {
+        window.location.href = appStoreLink;
+      }, 500);
+      
+      window.addEventListener('blur', function() {
+        clearTimeout(fallbackTimer);
+      });
+      return;
+    }
+    
+    // 其他未知域名：仅显示页面，不做自动操作
+    console.log('⚠️ 未知域名，仅展示页面');
   })();
 </script>
 </body>
