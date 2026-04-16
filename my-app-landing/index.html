@@ -71,40 +71,33 @@
   </div>
 
   <script>
-    (function() {
-      var appStoreLink = 'https://apps.apple.com/hk/app/id-one/id6755210949';
-      var customDomain = 'webekyc-uat.tradelinksig.com';
-      
-      var currentHostname = window.location.hostname;
-      var isLocalhost = currentHostname === 'localhost' || currentHostname === '127.0.0.1';
-      var isVercelPreview = currentHostname.endsWith('.vercel.app');
-      
-      if (isLocalhost) {
-        console.log('🧪 测试环境：跳过自动唤起 App');
-        if (isVercelPreview) {
-          var indicator = document.createElement('div');
-          indicator.style.cssText = 'background:#f0f0f0;color:#666;padding:4px 12px;border-radius:20px;font-size:0.75rem;margin-top:1rem;';
-          indicator.innerText = '🧪 Vercel 预览模式';
-          document.querySelector('.container').appendChild(indicator);
-        }
-        return;
-      }
-      
-      // if (currentHostname !== customDomain) {
-      //   return;
-      // }
-      
-      var appUniversalLink = 'https://' + customDomain + window.location.pathname + window.location.search;
-      window.location.href = appUniversalLink;
-      
-      var timer = setTimeout(function() {
-        window.location.href = appStoreLink;
-      }, 500);
-      
-      window.addEventListener('blur', function() {
-        clearTimeout(timer);
-      });
-    })();
-  </script>
+  (function() {
+    var appStoreLink = 'https://apps.apple.com/hk/app/id-one/id6755210949';
+    var customDomain = 'webekyc-uat.tradelinksig.com';
+    
+    var currentHostname = window.location.hostname;
+    var isLocalhost = currentHostname === 'localhost' || currentHostname === '127.0.0.1';
+    
+    // 只在本地开发环境跳过自动唤起（避免无限刷新）
+    if (isLocalhost) {
+      console.log('🧪 本地测试模式：跳过自动唤起');
+      return;
+    }
+    
+    // 在 Vercel 预览域名或自定义域名上，都尝试唤起 App
+    // 注意：Vercel 域名不是 Universal Link 关联域名，所以尝试唤起会失败，进而触发商店跳转
+    var appUniversalLink = window.location.href; // 直接使用当前完整 URL
+    
+    window.location.href = appUniversalLink;
+    
+    var timer = setTimeout(function() {
+      window.location.href = appStoreLink;
+    }, 500);
+    
+    window.addEventListener('blur', function() {
+      clearTimeout(timer);
+    });
+  })();
+</script>
 </body>
 </html>
