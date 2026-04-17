@@ -1,0 +1,31 @@
+{
+    "applinks": {
+        "details": [
+            {
+                "appIDs": [
+                    "8F5RD2FK9X.com.tradelink.ID-One"
+                ],
+                "components": [
+                    {
+                        "#": "no_universal_links",
+                        "exclude": true,
+                        "comment": "Matches any URL with a fragment that equals no_universal_links and instructs the system not to open it as a universal link."
+                    },
+                    {
+                        "/": "/form-filling/*",
+                        "comment": "Deep link for form fill"
+                    },
+                    {
+                        "/": "/auth/*",
+                        "comment": "Deep link for authentication"
+                    },
+                    {
+                        "/": "/signing/*",
+                        "comment": "Deep link for signing"
+                    }
+                ],
+                "paths": ["*"]
+            }
+        ]
+    }
+}
