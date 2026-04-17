@@ -12,16 +12,15 @@
                         "comment": "Matches any URL with a fragment that equals no_universal_links and instructs the system not to open it as a universal link."
                     },
                     {
-                        "/": "/form-filling/*",
-                        "comment": "Deep link for form fill"
+                        "/": "/action/*",
+                        "comment": "Deep link for actions"
                     },
                     {
-                        "/": "/auth/*",
-                        "comment": "Deep link for authentication"
+                        "/": "/profile/*"
                     },
                     {
-                        "/": "/signing/*",
-                        "comment": "Deep link for signing"
+                        "/": "/",
+                        "comment": "Home page"
                     }
                 ],
                 "paths": ["*"]
