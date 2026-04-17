@@ -72,44 +72,78 @@
 
   <script>
   (function() {
-    var appStoreLink = 'https://apps.apple.com/hk/app/id-one/id6755210949';
-    var customDomain = 'webekyc-uat.tradelinksig.com';
+    // 商店链接
+    var APP_STORE_LINK = 'https://apps.apple.com/hk/app/id-one/id6755210949';
+    var PLAY_STORE_LINK = 'https://play.google.com/store/apps/details?id=com.tradelink.idone';
     
+    // 自定义域名
+    var CUSTOM_DOMAIN = 'webekyc-uat.tradelinksig.com';
+    
+    var ua = navigator.userAgent || '';
     var host = window.location.hostname;
     var isLocal = host === 'localhost' || host === '127.0.0.1';
     var isVercel = host.endsWith('.vercel.app');
-    var isCustom = host === customDomain;
+    var isCustom = host === CUSTOM_DOMAIN;
     
-    // 本地开发：只显示页面，不自动跳转
-    if (isLocal) {
-      console.log('🧪 本地环境，无自动跳转');
+    // 设备检测
+    var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    var isAndroid = /Android/.test(ua);
+    
+    // 如果是本地或 Vercel 预览，只显示页面，不做自动操作
+    if (isLocal || isVercel) {
+      console.log('🧪 测试环境，跳过自动唤起');
       return;
     }
     
-    // Vercel 预览域名：直接跳转 App Store（不尝试唤起 App，避免循环）
-    if (isVercel) {
-      console.log('🚀 Vercel 预览域名，直接跳转 App Store');
-      window.location.href = appStoreLink;
+    // 只在自定义域名上执行
+    if (!isCustom) {
       return;
     }
     
-    // 正式自定义域名：尝试唤起 App，失败后跳转 App Store
-    if (isCustom) {
-      var appUniversalLink = window.location.href;
-      window.location.href = appUniversalLink;
-      
-      var fallbackTimer = setTimeout(function() {
-        window.location.href = appStoreLink;
+    // 获取当前完整 URL（Universal Link / App Link）
+    var deepLink = window.location.href;
+    
+    if (isIOS) {
+      // ---------- iOS Universal Link ----------
+      var timer = setTimeout(function() {
+        window.location.href = APP_STORE_LINK;
       }, 500);
       
       window.addEventListener('blur', function() {
+        clearTimeout(timer);
+      });
+      
+      // 尝试打开 App
+      window.location.href = deepLink;
+      
+    } else if (isAndroid) {
+      // ---------- Android App Links + Intent Fallback ----------
+      
+      // 方法1：尝试通过 App Links 打开（Chrome 等支持）
+      window.location.href = deepLink;
+      
+      // 方法2：如果 App 未安装，使用 Intent URL 尝试打开，并附加回退到 Play Store
+      var fallbackTimer = setTimeout(function() {
+        // Intent URL 结构：
+        // intent://.../...#Intent;scheme=https;package=包名;S.browser_fallback_url=商店链接;end;
+        var intentUrl = deepLink.replace(/^https:\/\//, 'intent://');
+        intentUrl = intentUrl + '#Intent;scheme=https;package=com.tradelink.idone;S.browser_fallback_url=' + encodeURIComponent(PLAY_STORE_LINK) + ';end;';
+        
+        window.location.href = intentUrl;
+      }, 300);
+      
+      // 如果 App 成功打开，页面会失去焦点或隐藏，取消计时器
+      window.addEventListener('blur', function() {
         clearTimeout(fallbackTimer);
       });
-      return;
+      window.addEventListener('pagehide', function() {
+        clearTimeout(fallbackTimer);
+      });
+      
+    } else {
+      // 其他设备（桌面等）不自动操作，仅显示页面
+      console.log('非移动设备，显示页面');
     }
-    
-    // 其他未知域名：仅显示页面，不做自动操作
-    console.log('⚠️ 未知域名，仅展示页面');
   })();
 </script>
 </body>
